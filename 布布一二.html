@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>布布一二心情生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Marker Felt', '微软雅黑', sans-serif;
+        }
+        
+        body {
+            min-height: 100vh;
+            background-image: url('https://pica.zhimg.com/v2-53fbf35f54855e01a2fc2725bde06a84_b.webp');
+            background-size: coverauto;
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+            margin-bottom: 30px;
+            border: 3px dashed #FF9E9E;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            color: #FF6B88;
+            text-shadow: 2px 2px 0px #FFF, 4px 4px 0px rgba(255, 107, 136, 0.3);
+        }
+        
+        .mood-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        @media (min-width: 600px) {
+            .mood-buttons {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (min-width: 800px) {
+            .mood-buttons {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+        
+        .mood-btn {
+            padding: 15px;
+            border-radius: 15px;
+            border: none;
+            background: linear-gradient(45deg, #FFB6C1, #FFD700);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .mood-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .mood-btn.开心 {
+            background: linear-gradient(45deg, #FF6B88, #FFD166);
+        }
+        
+        .mood-btn.难过 {
+            background: linear-gradient(45deg, #87CEFA, #118AB2);
+        }
+        
+        .mood-btn.生气 {
+            background: linear-gradient(45deg, #FF4D4D, #FF8C00);
+        }
+        
+        .mood-btn.紧张 {
+            background: linear-gradient(45deg, #98FB98, #06D6A0);
+        }
+        
+        .mood-btn.无语 {
+            background: linear-gradient(45deg, #A78BFA, #7E22CE);
+        }
+        
+        .result-container {
+            width: 100%;
+            display: none;
+            text-align: center;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .mood-display {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #FF6B88;
+        }
+        
+        .bubu-image {
+            max-width: 100%;
+            height: auto;
+            max-height: 400px;
+            border-radius: 15px;
+            border: 3px solid #FFB6C1;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .try-again {
+            padding: 12px 30px;
+            border-radius: 50px;
+            border: none;
+            background: linear-gradient(45deg, #06D6A0, #118AB2);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            box-shadow: 0 3px 10px rgba(6, 214, 160, 0.3);
+        }
+        
+        .try-again:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(6, 214, 160, 0.5);
+        }
+        
+        .loader {
+            display: none;
+            margin: 30px auto;
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 182, 193, 0.3);
+            border-radius: 50%;
+            border-top-color: #FF6B88;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>布布一二心情生成器</h1>
+        
+        <div class="mood-buttons">
+            <button class="mood-btn 开心" data-mood="开心">开心</button>
+            <button class="mood-btn 难过" data-mood="难过">难过</button>
+            <button class="mood-btn 生气" data-mood="生气">生气</button>
+            <button class="mood-btn 紧张" data-mood="紧张">紧张</button>
+            <button class="mood-btn 无语" data-mood="无语">无语</button>
+        </div>
+        
+        <div class="loader"></div>
+        
+        <div class="result-container">
+            <h2 class="mood-display">开心</h2>
+            <img src="" alt="布布一二表情" class="bubu-image">
+            <button class="try-again">再试一次</button>
+        </div>
+    </div>
+
+    <script>
+        // 布布一二图片数据
+        const bubuImages = {
+            "开心": [
+                "https://pic2.zhimg.com/v2-e65b05bdcd61667678d4aa215c407b6d_b.webp",
+                "https://picx.zhimg.com/v2-c743d0b462f684af0bc07ef014e9e90f_b.webp"
+            ],
+            "难过": [
+                "https://img1.baidu.com/it/u=651525907,2692683246&fm=253&fmt=auto&app=120&f=GIF?w=227&h=192"
+            ],
+            "生气": [
+                "https://picx.zhimg.com/v2-203e33001fb98742be9d2c932a8c8c5d_b.webp"
+            ],
+            "紧张": [
+                "https://pic2.zhimg.com/v2-0c8645b9b0930534636f69240826198d_b.webp"
+            ],
+            "无语": [
+                "https://picx.zhimg.com/v2-b665f057d2d5a8af72675f539a4a95fb_b.webp"
+            ]
+        };
+        
+        // 获取DOM元素
+        const moodButtons = document.querySelectorAll('.mood-btn');
+        const loader = document.querySelector('.loader');
+        const resultContainer = document.querySelector('.result-container');
+        const moodDisplay = document.querySelector('.mood-display');
+        const bubuImage = document.querySelector('.bubu-image');
+        const tryAgainBtn = document.querySelector('.try-again');
+        
+        // 心情按钮点击事件
+        moodButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const mood = this.getAttribute('data-mood');
+                showBubu(mood);
+            });
+        });
+        
+        // 再试一次按钮
+        tryAgainBtn.addEventListener('click', () => {
+            resultContainer.style.display = 'none';
+        });
+        
+        // 显示布布一二图片
+        function showBubu(mood) {
+            loader.style.display = 'block';
+            resultContainer.style.display = 'none';
+            
+            // 模拟加载延迟
+            setTimeout(() => {
+                // 检查是否有对应的图片
+                let images = bubuImages[mood];
+                if (!images || images.length === 0) {
+                    mood = "开心";
+                    images = bubuImages[mood];
+                }
+                
+                // 随机选择一张图片
+                const randomImage = images[Math.floor(Math.random() * images.length)];
+                
+                // 更新显示
+                moodDisplay.textContent = mood;
+                bubuImage.src = randomImage;
+                bubuImage.alt = `布布一二${mood}表情`;
+                
+                // 图片加载错误处理
+                bubuImage.onerror = function() {
+                    this.src = 'https://pic2.zhimg.com/v2-e65b05bdcd61667678d4aa215c407b6d_b.webp';
+                };
+                
+                loader.style.display = 'none';
+                resultContainer.style.display = 'block';
+                
+                // 滚动到结果
+                resultContainer.scrollIntoView({ behavior: 'smooth' });
+            }, 800);
+        }
+    </script>
+</body>
+</html>
